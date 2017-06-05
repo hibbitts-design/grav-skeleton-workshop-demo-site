@@ -8,5 +8,5 @@ gitrepo:
   editlinkicon: github
   editlinktext: 'View Markdown for this Page'
   edittreeurl: https://raw.githubusercontent.com/hibbitts-design/grav-skeleton-workshop-demo-site/master/user
-  viewtreetext: View this site's User folder
+  viewtreetext: Explore this site's User folder
   viewtreeurl: https://github.com/hibbitts-design/grav-skeleton-workshop-demo-site/tree/master/user
