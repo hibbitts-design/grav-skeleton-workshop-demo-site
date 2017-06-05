@@ -1,0 +1,8 @@
+name: MyTheme
+version: 1.0.0
+description: "Extending Bootstrap"
+icon: crosshairs
+author:
+ name: Team Grav
+ email: devs@getgrav.org
+ url: http://getgrav.org

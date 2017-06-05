@@ -4,4 +4,7 @@ author:
   email: 'joe@test.com'
 metadata:
     description: 'Grav is an easy to use, yet powerful, open source flat-file CMS'
-
+gitrepo:
+  editlinkicon: github
+  editlinktext: 'View Markdown for this Page'
+  edittreeurl: https://raw.githubusercontent.com/hibbitts-design/grav-skeleton-workshop-demo-site/master/user
