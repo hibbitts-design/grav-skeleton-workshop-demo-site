@@ -80,7 +80,3 @@ This is some different content for the **second** tab panel.
 
 [/ui-tab]
 [/ui-tabs]
-
-View this Markdown of this page on your computer to see what using the Shortcode UI (tabs) plugin looks like. You can also [view the Markdown for this page through the magic of GitHub](https://raw.githubusercontent.com/hibbitts-design/grav-demo-site/master/user/pages/01.home/default.md).
-
-
