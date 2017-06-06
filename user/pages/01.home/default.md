@@ -49,7 +49,7 @@ In the **'[Pages](../../admin/pages)'** panel press the **'Add Page'** button an
 
 >>> NOTE: The page will automatically show up in the Menu after the "Home" menu item. If you wish to change the name that shows up in the Menu, simple add: `menu: My Page` between the dashes in the page content. This is called the YAML front matter, and it is where you configure page-specific options.
 
-### Working with Media
+### Work with Media
 
 **Grav** has a lot of built-in media capabilities, with even more capabilities available by using available plugins.
 
@@ -59,6 +59,13 @@ For example, to display a clickable thumbnail which can be pressed on to view th
 
 Click on the below image to see the result:   
 ![Sample Image](sample-image.jpg?lightbox=600,400&resize=200,200)  
+
+Here is another example of built-in media processing, this time cropping an image:
+
+        ![Sample Image](sample-image.jpg?crop=100,100,300,200)
+
+And here is the actual cropped image:  
+![Sample Image](sample-image.jpg?crop=100,100,300,200)
 
 Learn more about Grav's media capabilities in the [Media](https://learn.getgrav.org/content/media) section of the [Learn Grav](http://learn.getgrav.org/) site.  
 
@@ -80,3 +87,5 @@ This is some different content for the **second** tab panel.
 
 [/ui-tab]
 [/ui-tabs]
+
+Ready for more? Explore this site to see a [Modular page created by a Page Collection](/modular), another [Modular page using the Page Inject Plugin](/modular-page-inject), and a [Blog page with child pages](/blog).
