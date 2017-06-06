@@ -88,4 +88,4 @@ This is some different content for the **second** tab panel.
 [/ui-tab]
 [/ui-tabs]
 
-Ready for more? Explore this site to see a [Modular page created by a Page Collection](/modular), another [Modular page using the Page Inject Plugin](/modular-page-inject), and a [Blog page with child pages](/blog).
+Ready for more? Explore this site to see a [Modular page](/modular) created by a [Page Collection](https://learn.getgrav.org/content/collections), another [Modular page](/modular-page-inject) using the [Page Inject Plugin](https://github.com/getgrav/grav-plugin-page-inject), and a [Blog page](/blog) created by a [Page Collection](https://learn.getgrav.org/content/collections).
