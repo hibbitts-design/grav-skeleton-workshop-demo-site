@@ -31,20 +31,27 @@ Navigate to the folder you installed **Grav** into, and then browse to the `user
 ### Create a New Page
 
 **Admin Panel**  
-In the **'[Pages](../../admin/pages)'** panel press the **'Add Page'** button and then choose the page file (type) `Default`. Pages in **Grav** can also include the content of other pages.
+1. In the **'[Pages](../../admin/pages)'** panel press the **'Add Page'** button and then enter `My Page` as the **Page Title**. Make sure that the **Page Template** is set to `Default`.  
+2. Enter the below page content of your choice on the newly created page, and then tap the `Save` button:
 
-**Working with Files**  
-1. Navigate to your pages folder: `user/pages/` and create a new folder.  In this example, we will use [explicit default ordering](http://learn.getgrav.org/content/content-pages) and call the folder `05.mypage`.
-2. Launch your text editor and paste in the following:
-
-        ---
-        title: My New Page
-        ---
         # My New Page!
 
         This is the body of **my new page** and I can easily use _Markdown_ syntax here.
 
-3. Save this file in the `user/pages/05.mypage/` folder as `default.md`. This will tell **Grav** to render the page using the **default** template.
+Pages in **Grav** can also include the content of other pages (i.e. Modular pages).
+
+**Working with Files**  
+1. Navigate to your pages folder: `user/pages/` and create a new folder.  In this example, we will use [explicit default ordering](http://learn.getgrav.org/content/content-pages) and call the folder `06.another-page`.
+2. Launch your text editor and paste in the following:
+
+        ---
+        title: Another Page
+        ---
+        # Another New Page!
+
+        This is the body of **a new page** and I can easily use _Markdown_ syntax here.
+
+3. Save this file in the `user/pages/06.another-page/` folder as `default.md`. This will tell **Grav** to render the page using the **default** template.
 4. That is it! Reload your browser to see your new page in the menu.
 
 >>> NOTE: The page will automatically show up in the Menu after the "Home" menu item. If you wish to change the name that shows up in the Menu, simple add: `menu: My Page` between the dashes in the page content. This is called the YAML front matter, and it is where you configure page-specific options.
