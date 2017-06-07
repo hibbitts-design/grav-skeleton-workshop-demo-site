@@ -12,5 +12,5 @@ gitrepo:
   viewtreeurl: https://github.com/hibbitts-design/grav-skeleton-workshop-demo-site/tree/master/user
 gitrepouser:
   viewfoldericon: github
-  viewfoldertext: Explore this site's User folder
+  viewfoldertext: Explore this Skeleton's User folder
   viewfolderurl: https://github.com/hibbitts-design/grav-skeleton-workshop-demo-site/tree/master/user
