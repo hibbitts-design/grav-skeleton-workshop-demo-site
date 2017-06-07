@@ -1,7 +1,7 @@
 title: Grav
 author:
-  name: Joe Bloggs
-  email: 'joe@test.com'
+  name: Jane Bloggs
+  email: 'jane@test.com'
 metadata:
     description: 'Grav is an easy to use, yet powerful, open source flat-file CMS'
 gitrepo:
@@ -10,3 +10,7 @@ gitrepo:
   edittreeurl: https://raw.githubusercontent.com/hibbitts-design/grav-skeleton-workshop-demo-site/master/user
   viewtreetext: Explore this site's User folder
   viewtreeurl: https://github.com/hibbitts-design/grav-skeleton-workshop-demo-site/tree/master/user
+gitrepouser:
+  viewfoldericon: github
+  viewfoldertext: Explore this site's User folder
+  viewfolderurl: https://github.com/hibbitts-design/grav-skeleton-workshop-demo-site/tree/master/user

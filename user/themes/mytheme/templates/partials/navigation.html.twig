@@ -45,21 +45,6 @@
             </a>
         </li>
     {% endfor %}
-    {% if config.site.gitrepo.edittreeurl %}
-      {% if page.header.gitrepoeditlinkurl %}
-        {% set gitrepoeditlinkurl = page.header.gitrepoeditlinkurl %}
-      {% else %}
-        {% set gitrepoeditlinkurl = config.site.gitrepo.edittreeurl ~  ('/'~page.filePathClean)|replace({'/user/':'/'}) %}
-      {% endif %}
-      <li>
-        <a class="newwindow" href="{{ gitrepoeditlinkurl }}" title="{{ config.site.gitrepo.editlinktext }}">
-        {% if config.site.gitrepo.editlinkicon %}
-          <i class="fa fa-{{ config.site.gitrepo.editlinkicon }}" aria-hidden="true"></i>
-        {% endif %}
-        {{ config.site.gitrepo.editlinktext }}</a>
-      </li>
-    {% endif %}
-    {% if config.plugins.login.enabled and grav.user.username %}
-        <li><i class="fa fa-lock"></i> {% include 'partials/login-status.html.twig' %}</li>
-    {% endif %}
+    {# display view/edit page in git link - hibbittsdesign.org #}
+    {% include 'partials/gitrepo_menu_link.html.twig' %}
 </ul>

@@ -73,12 +73,12 @@
                 <span><a href="#" id="toTop"><i class="fa fa-arrow-up"></i></a></span>
             </div>
             <p><a href="http://getgrav.org">Grav</a> was <i class="fa fa-code"></i> with <i class="fa fa-heart"></i> by <a href="http://www.rockettheme.com">RocketTheme</a>.
-              {% if config.site.gitrepo.edittreeurl %}
-                    <p><a class="newwindow" href="{{ config.site.gitrepo.viewtreeurl }}" title="{{ config.site.gitrepo.viewtreetext }}">
-                    {% if config.site.gitrepo.editlinkicon %}
-                      <i class="fa fa-{{ config.site.gitrepo.editlinkicon }}" aria-hidden="true"></i>
+              {% if config.site.gitrepouser.viewfolderurl %}
+                    <p><a class="newwindow" href="{{ config.site.gitrepo.viewtreeurl }}" title="{{ config.site.gitrepouser.viewfoldertext }}">
+                    {% if config.site.gitrepouser.viewfoldericon %}
+                      <i class="fa fa-{{ config.site.gitrepouser.viewfoldericon }}" aria-hidden="true"></i>
                     {% endif %}
-                    {{ config.site.gitrepo.viewtreetext }}</a><br>
+                    {{ config.site.gitrepouser.viewfoldertext }}</a><br>
                 {% endif %}
             </p>
         </footer>

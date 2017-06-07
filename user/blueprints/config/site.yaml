@@ -1,0 +1,36 @@
+@extends:
+    '@parent'
+
+form:
+    fields:
+        sectionone:
+            type:                              section
+            title:                             Edit Page in Git Link
+            underline:                         true
+
+            fields:
+                gitrepo.editlinktext:
+                  type:                        input.text
+                  size:                        medium
+                  label:                       Edit Page Link Text
+                  default:                     'Edit this Page'
+                  description:                 Customize the View/Edit Page in Git link text.
+
+                gitrepo.editlinkicon:
+                    type:                      text
+                    size:                      small
+                    label:                     Edit Page Link Font Awesome Icon
+                    default:                   'github'
+                    description:               Icon short name.
+                    help:                      Enter the short name of the Font Awesome icon for the link, for example 'gitlab'.
+                    validate:
+                        type:                  text
+
+                gitrepo.edittreeurl:
+                    type:                      text
+                    size:                      large
+                    label:                     Git Repository Tree URL
+                    help:                      Enter the URL that leads to the pages folder of your Git Repository.
+                    description:               "URL path to the pages folder, but with '/pages' and everything following it removed. For example, 'https://github.com/paulhibbitts/demo-grav-course-hub/tree/master'."
+                    validate:
+                        type:                  URL
