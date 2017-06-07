@@ -69,10 +69,10 @@ Click on the below image to see the result:
 
 Here is another example of built-in media processing, this time cropping an image:
 
-        ![Sample Image](sample-image.jpg?crop=100,100,300,200)
+        ![Sample Image](sample-image.jpg?crop=150,100,200,200)
 
 And here is the actual cropped image:  
-![Sample Image](sample-image.jpg?crop=100,100,300,200)
+![Sample Image](sample-image.jpg?crop=150,100,200,200)
 
 Learn more about Grav's media capabilities in the [Media](https://learn.getgrav.org/content/media) section of the [Learn Grav](http://learn.getgrav.org/) site.  
 
