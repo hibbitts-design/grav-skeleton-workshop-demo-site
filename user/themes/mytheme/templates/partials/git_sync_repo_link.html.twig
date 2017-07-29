@@ -4,11 +4,11 @@
     {% if not (theme_config.type_of_git_sync_repo_link == 'edit') or (theme_config.type_of_git_sync_repo_link == 'edit' and theme_config.git_sync_repo_link is not empty) %}
       {% if theme_config.custom_git_sync_repo_link_icon is empty %}
         {% set git_sync_repo_link = config.plugins['git-sync'].repository %}
-          {% if 'github' in git_sync_repo_link %}
+          {% if 'github' in git_sync_repo_link or 'github' in theme_config.git_sync_repo_link %}
             {% set git_repo_link_icon = "github" %}
-          {% elseif 'gitlab' in git_sync_repo_link %}
+          {% elseif 'gitlab' in git_sync_repo_link or 'gitlab' in theme_config.git_sync_repo_link %}
             {% set git_repo_link_icon = "gitlab" %}
-          {% elseif 'bitbucket' in git_sync_repo_link %}
+          {% elseif 'bitbucket' in git_sync_repo_link or 'bitbucket' in theme_config.git_sync_repo_link %}
             {% set git_repo_link_icon = "bitbucket" %}
           {% else %}
             {% set git_repo_link_icon = "git" %}

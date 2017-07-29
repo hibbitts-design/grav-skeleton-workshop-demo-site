@@ -8,4 +8,3 @@ display_of_git_sync_repo_link: menu
 type_of_git_sync_repo_link: edit
 custom_git_sync_repo_link_text: 'View Markdown for this Page'
 git_sync_repo_link: 'https://raw.githubusercontent.com/hibbitts-design/grav-skeleton-workshop-demo-site/master/user'
-custom_git_sync_repo_link_icon: github
