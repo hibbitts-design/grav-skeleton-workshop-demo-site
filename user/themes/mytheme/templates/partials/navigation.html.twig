@@ -45,6 +45,11 @@
             </a>
         </li>
     {% endfor %}
-    {# display view/edit page in git link - hibbittsdesign.org #}
-    {% include 'partials/gitrepo_menu_link.html.twig' %}
+    {# check to display git sync link in footer - hibbittsdesign.org #}
+    {% if theme_config.display_of_git_sync_repo_link == 'menu' %}
+      <li>{% include 'partials/git_sync_repo_link.html.twig' %}</li>
+    {% endif %}
+    {% if config.plugins.login.enabled and grav.user.username %}
+        <li><i class="fa fa-lock"></i> {% include 'partials/login-status.html.twig' %}</li>
+    {% endif %}
 </ul>

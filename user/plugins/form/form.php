@@ -96,7 +96,12 @@ class FormPlugin extends Plugin
 
             $page_forms = [];
 
-            // get the forms from the page headers
+            // Force never_cache_twig if modular form
+            if ($page->modular()) {
+                $header->never_cache_twig = true;
+            }
+
+            // Get the forms from the page headers
             if (isset($header->forms)) {
                 $page_forms = $header->forms;
             } elseif (isset($header->form)) {

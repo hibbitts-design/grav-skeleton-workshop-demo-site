@@ -1,8 +1,63 @@
-name: MyTheme
-version: 1.0.0
-description: "Extending Bootstrap"
+name: Grav Workshop Demo MyTheme
+version: 0.9.0
+description: "Extending Antimatter"
 icon: crosshairs
 author:
- name: Team Grav
- email: devs@getgrav.org
- url: http://getgrav.org
+ name: Paul Hibbitts
+ email: paul@hibbittsdesign.org
+ url: http://hibbittsdesign.org
+
+dependencies:
+  - admin
+  - email
+  - form
+  - git-sync
+  - login
+  - antimatter
+
+form:
+  validation: loose
+  fields:
+    display_of_git_sync_repo_link:
+        type: select
+        size: medium
+        classes: fancy
+        label: Display of Git Sync Link
+        default: footer
+        options:
+            menu: Menu
+            footer: Footer
+            none: None
+
+    type_of_git_sync_repo_link:
+        type: select
+        size: medium
+        label: Type of Git Sync Link
+        default: view
+        options:
+            edit: View/Edit Page in Git Repostory
+            view: View Git Repository
+
+    custom_git_sync_repo_link_icon:
+        type: input.text
+        size: small
+        label: Custom Git Sync Font Awesome Icon
+        description: Short name, e.g. 'code-fork'.
+        validate:
+            type: text
+
+    custom_git_sync_repo_link_text:
+        type: input.text
+        size: medium
+        label: Custom Git Sync Link Text
+        description: Git Sync link text, e.g. 'View Page in GitHub'.
+        validate:
+            type: text
+
+    git_sync_repo_link:
+        type: input.url
+        label: Git Repository Tree URL
+        help: Enter the URL that leads to the pages folder of your Git Repository.
+        description: "URL path to pages folder for 'View/Edit Page in Git Repository' option, but with '/pages' and everything following it removed. For example, 'https://github.com/paulhibbitts/demo-grav-course-hub/tree/master'."
+        validate:
+            type: URL

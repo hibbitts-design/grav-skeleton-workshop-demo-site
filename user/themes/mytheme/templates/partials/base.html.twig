@@ -29,7 +29,6 @@
     {{ assets.css() }}
 
     {% block javascripts %}
-        {% do assets.add('theme://js/my.js', 99) %}
         {% do assets.addJs('jquery', 101) %}
         {% do assets.addJs('theme://js/modernizr.custom.71422.js', 100) %}
         {% do assets.addJs('theme://js/antimatter.js') %}
@@ -72,15 +71,11 @@
             <div class="totop">
                 <span><a href="#" id="toTop"><i class="fa fa-arrow-up"></i></a></span>
             </div>
-            <p><a href="http://getgrav.org">Grav</a> was <i class="fa fa-code"></i> with <i class="fa fa-heart"></i> by <a href="http://www.rockettheme.com">RocketTheme</a>.
-              {% if config.site.gitrepouser.viewfolderurl %}
-                    <p><a class="newwindow" href="{{ config.site.gitrepo.viewtreeurl }}" title="{{ config.site.gitrepouser.viewfoldertext }}">
-                    {% if config.site.gitrepouser.viewfoldericon %}
-                      <i class="fa fa-{{ config.site.gitrepouser.viewfoldericon }}" aria-hidden="true"></i>
-                    {% endif %}
-                    {{ config.site.gitrepouser.viewfoldertext }}</a><br>
-                {% endif %}
-            </p>
+            {# check to display git sync link in footer - hibbittsdesign.org #}
+            {% if theme_config.display_of_git_sync_repo_link == 'footer' %}
+              <p>{% include 'partials/git_sync_repo_link.html.twig' %}</p>
+            {% endif %}
+            <p><a href="http://getgrav.org">Grav</a> was <i class="fa fa-code"></i> with <i class="fa fa-heart"></i> by <a href="http://www.rockettheme.com">RocketTheme</a>.<p>
         </footer>
         {% endblock %}
     </div>
