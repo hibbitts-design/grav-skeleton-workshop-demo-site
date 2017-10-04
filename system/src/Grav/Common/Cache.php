@@ -63,6 +63,14 @@ class Cache extends Getters
         'asset://',
     ];
 
+    protected static $standard_remove_no_images = [
+        'cache://twig/',
+        'cache://doctrine/',
+        'cache://compiled/',
+        'cache://validated-',
+        'asset://',
+    ];
+
     protected static $all_remove = [
         'cache://',
         'cache://images',
@@ -232,12 +240,18 @@ class Cache extends Getters
             case 'redis':
                 $redis = new \Redis();
                 $socket = $this->config->get('system.cache.redis.socket', false);
+                $password = $this->config->get('system.cache.redis.password', false);
 
                 if ($socket) {
                     $redis->connect($socket);
                 } else {
                     $redis->connect($this->config->get('system.cache.redis.server', 'localhost'),
                     $this->config->get('system.cache.redis.port', 6379));
+                }
+
+                // Authenticate with password if set
+                if ($password && !$redis->auth($password)) {
+                    throw new \RedisException('Redis authentication failed');
                 }
 
                 $driver = new DoctrineCache\RedisCache();
@@ -360,7 +374,12 @@ class Cache extends Getters
                 $remove_paths = self::$tmp_remove;
                 break;
             default:
-                $remove_paths = self::$standard_remove;
+                if (Grav::instance()['config']->get('system.cache.clear_images_by_default')) {
+                    $remove_paths = self::$standard_remove;
+                } else {
+                    $remove_paths = self::$standard_remove_no_images;
+                }
+
         }
 
         // Clearing cache event to add paths to clear

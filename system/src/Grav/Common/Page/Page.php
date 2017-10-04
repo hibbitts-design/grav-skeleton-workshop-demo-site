@@ -42,6 +42,7 @@ class Page
     protected $parent;
     protected $template;
     protected $expires;
+    protected $cache_control;
     protected $visible;
     protected $published;
     protected $publish_date;
@@ -115,7 +116,7 @@ class Page
      * Initializes the page instance variables based on a file
      *
      * @param  \SplFileInfo $file The file information for the .md file that the page represents
-     * @param  string       $extension
+     * @param  string $extension
      *
      * @return $this
      */
@@ -330,7 +331,8 @@ class Page
                         $frontmatter_file = $this->path . '/' . $this->folder . '/frontmatter.yaml';
                         if (file_exists($frontmatter_file)) {
                             $frontmatter_data = (array)Yaml::parse(file_get_contents($frontmatter_file));
-                            $this->header = (object)array_replace_recursive($frontmatter_data, (array)$this->header);
+                            $this->header = (object)array_replace_recursive($frontmatter_data,
+                                (array)$this->header);
                         }
                         // Process frontmatter with Twig if enabled
                         if (Grav::instance()['config']->get('system.pages.frontmatter.process_twig') === true) {
@@ -429,6 +431,9 @@ class Page
             if (isset($this->header->expires)) {
                 $this->expires = intval($this->header->expires);
             }
+            if (isset($this->header->cache_control)) {
+                $this->cache_control = $this->header->cache_control;
+            }
             if (isset($this->header->etag)) {
                 $this->etag = (bool)$this->header->etag;
             }
@@ -481,9 +486,11 @@ class Page
      *
      * @param  int $size Max summary size.
      *
+     * @param boolean $textOnly Only count text size.
+     *
      * @return string
      */
-    public function summary($size = null)
+    public function summary($size = null, $textOnly = false)
     {
         $config = (array)Grav::instance()['config']->get('site.summary');
         if (isset($this->header->summary)) {
@@ -497,11 +504,12 @@ class Page
 
         // Set up variables to process summary from page or from custom summary
         if ($this->summary === null) {
-            $content = $this->content();
+            $content = $textOnly ? strip_tags($this->content()) : $this->content();
             $summary_size = $this->summary_size;
         } else {
-            $content = $this->summary;
-            $summary_size = mb_strlen($this->summary);
+            $content = strip_tags($this->summary);
+            // Use mb_strwidth to deal with the 2 character widths characters
+            $summary_size = mb_strwidth($content, 'utf-8');
         }
 
         // Return calculated summary based on summary divider's position
@@ -510,7 +518,12 @@ class Page
         if (!in_array($format, ['short', 'long'])) {
             return $content;
         } elseif (($format === 'short') && isset($summary_size)) {
-            return mb_substr($content, 0, $summary_size);
+            // Use mb_strimwidth to slice the string
+            if (mb_strwidth($content, 'utf8') > $summary_size) {
+                return mb_substr($content, 0, $summary_size);
+            } else {
+                return $content;
+            }
         }
 
         // Get summary size from site config's file
@@ -524,6 +537,15 @@ class Page
             // Return calculated summary based on defaults
         } elseif (!is_numeric($size) || ($size < 0)) {
             $size = 300;
+        }
+
+        // Only return string but not html, wrap whatever html tag you want when using
+        if ($textOnly) {
+            if (mb_strwidth($content, 'utf-8') <= $size) {
+                return $content;
+            }
+
+            return mb_strimwidth($content, 0, $size, '...', 'utf-8');
         }
 
         $summary = Utils::truncateHTML($content, $size);
@@ -586,7 +608,7 @@ class Page
 
 
             $process_markdown = $this->shouldProcess('markdown');
-            $process_twig = $this->shouldProcess('twig') || $this->modularTwig() ;
+            $process_twig = $this->shouldProcess('twig') || $this->modularTwig();
 
             $cache_enable = isset($this->header->cache_enable) ? $this->header->cache_enable : $config->get('system.cache.enabled',
                 true);
@@ -797,7 +819,7 @@ class Page
      * Get value from a page variable (used mostly for creating edit forms).
      *
      * @param string $name Variable name.
-     * @param mixed  $default
+     * @param mixed $default
      *
      * @return mixed
      */
@@ -1074,7 +1096,7 @@ class Page
     public function toArray()
     {
         return [
-            'header'  => (array)$this->header(),
+            'header' => (array)$this->header(),
             'content' => (string)$this->value('content')
         ];
     }
@@ -1248,6 +1270,22 @@ class Page
         }
 
         return !isset($this->expires) ? Grav::instance()['config']->get('system.pages.expires') : $this->expires;
+    }
+
+    /**
+     * Gets and sets the cache-control property.  If not set it will return the default value (null)
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control for more details on valid options
+     *
+     * @param null $var
+     * @return null
+     */
+    public function cacheControl($var = null)
+    {
+        if ($var !== null) {
+            $this->cache_control = $var;
+        }
+
+        return !isset($this->cache_control) ? Grav::instance()['config']->get('system.pages.cache_control') : $this->cache_control;
     }
 
     /**
@@ -1466,9 +1504,9 @@ class Page
                     foreach ($value as $property => $prop_value) {
                         $prop_key = $key . ":" . $property;
                         $this->metadata[$prop_key] = [
-                            'name'     => $prop_key,
+                            'name' => $prop_key,
                             'property' => $prop_key,
-                            'content'  => htmlspecialchars($prop_value, ENT_QUOTES, 'UTF-8')
+                            'content' => htmlspecialchars($prop_value, ENT_QUOTES, 'UTF-8')
                         ];
                     }
                 } else {
@@ -1477,7 +1515,7 @@ class Page
                         if (in_array($key, $header_tag_http_equivs)) {
                             $this->metadata[$key] = [
                                 'http_equiv' => $key,
-                                'content'    => htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+                                'content' => htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
                             ];
                         } elseif ($key == 'charset') {
                             $this->metadata[$key] = ['charset' => htmlspecialchars($value, ENT_QUOTES, 'UTF-8')];
@@ -1485,7 +1523,10 @@ class Page
                             // if it's a social metadata with separator, render as property
                             $separator = strpos($key, ':');
                             $hasSeparator = $separator && $separator < strlen($key) - 1;
-                            $entry = ['name' => $key, 'content' => htmlspecialchars($value, ENT_QUOTES, 'UTF-8')];
+                            $entry = [
+                                'name' => $key,
+                                'content' => htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+                            ];
 
                             if ($hasSeparator) {
                                 $entry['property'] = $key;
@@ -1569,6 +1610,7 @@ class Page
      * Returns the canonical URL for a page
      *
      * @param bool $include_lang
+     *
      * @return string
      */
     public function canonical($include_lang = true)
@@ -1583,6 +1625,7 @@ class Page
      * @param bool $canonical true to return the canonical URL
      * @param bool $include_lang
      * @param bool $raw_route
+     *
      * @return string The url.
      */
     public function url($include_host = false, $canonical = false, $include_lang = true, $raw_route = false)
@@ -2228,6 +2271,23 @@ class Page
     }
 
     /**
+     * Returns the item in the current position.
+     *
+     * @param  string $path the path the item
+     *
+     * @return Integer   the index of the current page.
+     */
+    public function currentPosition()
+    {
+        $collection = $this->parent()->collection('content', false);
+        if ($collection instanceof Collection) {
+            return $collection->currentPosition($this->path());
+        }
+
+        return true;
+    }
+
+    /**
      * Returns whether or not this page is the currently active page requested via the URL.
      *
      * @return bool True if it is active
@@ -2307,7 +2367,7 @@ class Page
      * Helper method to return an ancestor page.
      *
      * @param string $url The url of the page
-     * @param bool   $lookup Name of the parent folder
+     * @param bool $lookup Name of the parent folder
      *
      * @return \Grav\Common\Page\Page page you were looking for if it exists
      */
@@ -2323,7 +2383,7 @@ class Page
      * Helper method to return an ancestor page to inherit from. The current
      * page object is returned.
      *
-     * @param string   $field Name of the parent folder
+     * @param string $field Name of the parent folder
      *
      * @return Page
      */
@@ -2335,11 +2395,12 @@ class Page
 
         return $inherited;
     }
+
     /**
      * Helper method to return an ancestor field only to inherit from. The
      * first occurrence of an ancestor field will be returned if at all.
      *
-     * @param string   $field Name of the parent folder
+     * @param string $field Name of the parent folder
      *
      * @return array
      */
@@ -2353,7 +2414,7 @@ class Page
     /**
      * Method that contains shared logic for inherited() and inheritedField()
      *
-     * @param string   $field Name of the parent folder
+     * @param string $field Name of the parent folder
      *
      * @return array
      */
@@ -2363,11 +2424,12 @@ class Page
 
         /** @var Pages $pages */
         $inherited = $pages->inherited($this->route, $field);
-        $inheritedParams = (array) $inherited->value('header.' . $field);
-        $currentParams = (array) $this->value('header.' . $field);
-        if($inheritedParams && is_array($inheritedParams)) {
+        $inheritedParams = (array)$inherited->value('header.' . $field);
+        $currentParams = (array)$this->value('header.' . $field);
+        if ($inheritedParams && is_array($inheritedParams)) {
             $currentParams = array_replace_recursive($inheritedParams, $currentParams);
         }
+
         return [$inherited, $currentParams];
     }
 
@@ -2375,7 +2437,7 @@ class Page
      * Helper method to return a page.
      *
      * @param string $url the url of the page
-     * @param bool   $all
+     * @param bool $all
      *
      * @return \Grav\Common\Page\Page page you were looking for if it exists
      */
@@ -2391,7 +2453,7 @@ class Page
      * Get a collection of pages in the current context.
      *
      * @param string|array $params
-     * @param boolean      $pagination
+     * @param boolean $pagination
      *
      * @return Collection
      * @throws \InvalidArgumentException
@@ -2441,6 +2503,41 @@ class Page
                             }
                         }
                     }
+                }
+            }
+        }
+
+        // If  a filter or filters are set, filter the collection...
+        if (isset($params['filter'])) {
+            foreach ((array)$params['filter'] as $type => $filter) {
+                switch ($type) {
+                    case 'visible':
+                        $collection->visible($filter);
+                        break;
+                    case 'non-visible':
+                        $collection->nonVisible($filter);
+                        break;
+                    case 'modular':
+                        $collection->modular($filter);
+                        break;
+                    case 'non-modular':
+                        $collection->nonModular($filter);
+                        break;
+                    case 'routable':
+                        $collection->routable($filter);
+                        break;
+                    case 'non-routable':
+                        $collection->nonRoutable($filter);
+                        break;
+                    case 'type':
+                        $collection->ofType($filter);
+                        break;
+                    case 'types':
+                        $collection->ofOneOfTheseTypes($filter);
+                        break;
+                    case 'access':
+                        $collection->ofOneOfTheseAccessLevels($filter);
+                        break;
                 }
             }
         }
@@ -2727,7 +2824,7 @@ class Page
 
         // Reorder all moved pages.
         foreach ($siblings as $slug => $page) {
-            $order = intval(trim($page->order(),'.'));
+            $order = intval(trim($page->order(), '.'));
             $counter++;
 
             if ($order) {

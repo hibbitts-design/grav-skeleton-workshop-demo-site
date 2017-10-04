@@ -174,7 +174,7 @@ class Grav extends Container
         }
 
         if ($code === null) {
-            $code = $this['config']->get('system.pages.redirect_default_code', 301);
+            $code = $this['config']->get('system.pages.redirect_default_code', 302);
         }
 
         if (isset($this['session'])) {
@@ -227,13 +227,22 @@ class Grav extends Container
 
         header('Content-type: ' . Utils::getMimeByExtension($format, 'text/html'));
 
+        $cache_control = $page->cacheControl();
+
         // Calculate Expires Headers if set to > 0
         $expires = $page->expires();
 
         if ($expires > 0) {
             $expires_date = gmdate('D, d M Y H:i:s', time() + $expires) . ' GMT';
-            header('Cache-Control: max-age=' . $expires);
+            if (!$cache_control) {
+                header('Cache-Control: max-age=' . $expires);
+            }
             header('Expires: ' . $expires_date);
+        }
+
+        // Set cache-control header
+        if ($cache_control) {
+            header('Cache-Control: ' . strtolower($cache_control));
         }
 
         // Set the last modified time
@@ -491,5 +500,7 @@ class Grav extends Container
                 Utils::download($page->path() . DIRECTORY_SEPARATOR . $uri->basename(), $download);
             }
         }
+
+        return $page;
     }
 }
