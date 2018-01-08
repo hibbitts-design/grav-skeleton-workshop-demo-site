@@ -14,6 +14,26 @@ $ bin/gpm install email
 
 By default, the plugin uses PHP Mail as the mail engine. 
 
+```
+enabled: true
+from:
+from_name:
+to:
+to_name:
+mailer:
+  engine: sendmail
+  smtp:
+    server: localhost
+    port: 25
+    encryption: none
+    user: ''
+    password: ''
+  sendmail:
+    bin: '/usr/sbin/sendmail -bs'
+content_type: text/html
+debug: false
+```
+
 You can configure the Email plugin by using the Admin plugin, navigating to the Plugins list and choosing `Email`.
 
 That's the easiest route. Or you can also alter the Plugin configuration by copying the `user/plugins/email/email.yaml` file into `user/config/plugins/email.yaml` and make your modifications there.
@@ -22,7 +42,9 @@ The first setting you'd likely change is your `Email from` / `Email to` names an
 
 Also, you'd likely want to setup a SMTP server instead of using PHP Mail, as the latter is not 100% reliable and you might experience problems with emails.
 
-# Testing emails
+> NOTE: `engine: mail` has been deprecated from the SwiftMail library that this plugin uses as it does not funtion at all.  Please use `smtp` if at all possibe, and `sendmail` if SMTP is not an option.
+
+### Mailtrap.io
 
 A good way to test emails is to use a SMTP server service that's built for testing emails, for example [https://mailtrap.io](https://mailtrap.io)
 
@@ -42,6 +64,120 @@ mailer:
 That service will intercept emails and show them on their web-based interface instead of sending them for real.
 
 You can try and fine tune the emails there while testing.
+
+### Google Email
+
+A popular option for sending email is to simply use your Google Accounts SMTP server.  To set this up you will need to do 2 things first:
+
+1. Enable IMAP in your Gmail `Settings` -> `Forwarding and POP/IMAP` -> `IMAP Access`
+2. Enable `Less secure apps` in your [user account settings](https://myaccount.google.com/lesssecureapps)
+3. If you have 2-factor authentication, you will need to create a unique application password to use rather than your personal password
+
+Then configure the Email plugin:
+
+```
+mailer:
+  engine: smtp
+  smtp:
+    server: smtp.gmail.com
+    port: 465
+    encryption: ssl
+    user: 'YOUR_GOOGLE_EMAIL_ADDRESS'
+    password: 'YOUR_GOOGLE_PASSWORD'
+```
+
+> NOTE: Check your email sending limits: https://support.google.com/a/answer/166852?hl=en
+
+#### Sparkpost
+
+Generous email sending limits even in the free tier, and simple setup, make [Sparkpost](https://www.sparkpost.com) a great option for email sending. You just need to create an account, then setup a verified sending domain.  Sparkpost does a nice job of making this process very easy and undertandable. Then just click on the SMTP Relay option to get your details for the configuration:
+
+```
+mailer:
+  engine: smtp
+  smtp:
+    server: smtp.sparkpostmail.com
+    port: 587
+    encryption: tls
+    user: 'SMTP_Injection'
+    password: 'SEND_EMAIL_API_KEY'
+```
+
+Then try sending a test email...
+
+#### Sendgrid
+
+[Sendgrid](https://sendgrid.com) offers a very easy-to-setup serivce with 100 emails/day for free.  The next level allows you to send 40k/email a day for just $10/month. Configuration is pretty simple, just create an account, then click SMTP integration and click the button to create an API key.  The configuration is as follows:
+
+```
+mailer:
+  engine: smtp
+  smtp:
+    server: smtp.sendgrid.net
+    port: 587
+    encryption: tls
+    user: 'apikey'
+    password: 'YOUR_SENDGRID_API_KEY'
+```
+
+#### Mailgun
+
+[Mailgun is a great service](https://www.mailgun.com/) that offers 10k/emails per month for free.  Setup does require SPIF domain verification so that means you need to add at least a TXT entry in your DNS.  This is pretty standard for SMTP sending services and does provide verification for remote email servers and makes your email sending more reliable.  The Mailgun site, walks you through this process however, and the verification process is simple and fast.
+
+```
+mailer:
+  engine: smtp
+  smtp:
+    server: smtp.mailgun.org
+    port: 587
+    encryption: tls
+    user: 'MAILGUN_EMAIL_ADDRESS'
+    password: 'MAILGUN_EMAIL_PASSWORD'
+```
+
+Adjust these configurations for your account.
+
+#### MailJet
+
+Mailjet is another great service that is easy to quickly setup and get started sending email.  The free account gives you 200 emails/day or 600 emails/month.  Just signup and setup your SPF and DKIM entries for your domain.  Then click on the SMTP settings and use those to configure the email plugin:
+
+```
+mailer:
+  engine: smtp
+  smtp:
+    server: in-v3.mailjet.com
+    port: 587
+    encryption: tls
+    user: 'MAILJUST_USERNAME_API_KEY'
+    password: 'MAILJUST_PASSWORD_SECRET_KEY'
+```
+
+It's that easy!
+
+#### Sendmail
+
+Although not as reliable as SMTP not providing as much debug information, sendmail is a simple option as long as your hosting provider is not blocking the default SMTP port `25`:
+
+```
+mailer:
+  engine: sendmail
+  sendmail:
+    bin: '/usr/sbin/sendmail -bs'
+```
+
+Simply adjust your binary command line to suite your environment
+
+### SMTP Email Services
+
+Solid SMTP options that even provide a FREE tier for low email volumes include:
+
+* SendGrid (100/day free) - https://sendgrid.com
+* Mailgun - (10k/month free) - https://www.mailgun.com
+* Mailjet - (6k/month free) - https://www.mailjet.com/
+* Sparkpost - (15k/month free) - https://www.sparkpost.com
+* Amazon SES (62k/month free) - https://aws.amazon.com/ses/
+
+If you are still unsure why should be using one in the first place, check out this article: https://zapier.com/learn/email-marketing/best-transactional-email-sending-services/
 
 ## Testing with CLI Command
 
@@ -77,7 +213,7 @@ Add this code in your plugins:
 
         $sent = $this->grav['Email']->send($message);
 ```
-
+ 
 # Emails sent with Forms
 
 When executing email actions during form processing, action parameters are inherited from the global configuration but may also be overridden on a per-action basis.
@@ -204,6 +340,33 @@ body:
 # Troubleshooting
 
 ## Emails are not sent
+
+#### Debugging
+
+The first step in determining why emails are not sent is to enable debugging.  This can be done via the `user/config/email.yaml` file or via the plugin settings in the admin.  Just enable this and then try sending an email again.  Then inspect the `logs/email.log` file for potential problems.
+
+#### ISP Port 25 blocking 
+
+By default, when sending via PHP or Sendmail the machine running the webserver will attempt to send mail using the SMTP protocol.  This uses port `25` which is often blocked by ISPs to protected against spamming.  You can determine if this port is blocked by running this command in your temrinal (mac/linux only):
+
+```
+(echo >/dev/tcp/localhost/25) &>/dev/null && echo "TCP port 25 opened" || echo "TCP port 25 closed"
+```
+
+If it's blocked there are ways to configure relays to different ports, but the simplest solution is to use SMTP for mail sending.
+
+
+#### Exceptions
+
+If you get an exception when sending email but you cannot see what the error is, you need to enable more verbose exception messages. In the `user/config/system.yaml` file ensure your have the following configuration:
+
+```
+errors:
+  display: 1                                    
+  log: true 
+```
+
+## Configuration Issues
 
 As explained above in the Configuration section, if you're using the default settings, set the Plugin configuration to use a SMTP server. It can be [Gmail](https://www.digitalocean.com/community/tutorials/how-to-use-google-s-smtp-server) or another SMTP server you have at your disposal. 
 

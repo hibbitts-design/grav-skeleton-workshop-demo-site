@@ -21,12 +21,13 @@
 {% endif %}
 
 <form name="{{ form.name }}"
-      action="{{ action }}"
+      action="{{ action | trim('/', 'right') }}"
       method="{{ method }}"{{ multipart }}
       {% if form.id %}id="{{ form.id }}"{% endif %}
       {% block form_classes %}
       class="{{ form_outer_classes }} {{ form.classes }}"
       {% endblock %}
+      {% if form.novalidate %}novalidate{% endif %}
 >
 
   {% block inner_markup_fields_start %}{% endblock %}

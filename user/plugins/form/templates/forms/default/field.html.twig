@@ -2,6 +2,8 @@
 {% set toggleableChecked = field.toggleable and (originalValue is not null and originalValue is not empty) %}
 {% set isDisabledToggleable = field.toggleable and not toggleableChecked %}
 {% set value = (is_object(value) or value is null ? field.default : value) %}
+{% set cookie_name = 'forms-' ~ form.name ~ '-' ~ field.name %}
+{% set value = (is_object(value) or value is null ? (get_cookie(cookie_name) is null ? field.default : get_cookie(cookie_name)) : value) %}
 {% set errors = attribute(form.messages, field.name) %}
 
 {% block field %}
@@ -38,7 +40,7 @@
                                 value="{{ value|join(', ')|e('html_attr') }}"
                                 {# input attribute structures #}
                                 {% block input_attributes %}
-                                    {% if field.classes is defined %}class="{{ field.classes }}" {% endif %}
+                                    class="{{ form_field_input_classes }} {{ field.classes }}"
                                     {% if field.id is defined %}id="{{ field.id|e }}" {% endif %}
                                     {% if field.style is defined %}style="{{ field.style|e }}" {% endif %}
                                     {% if field.disabled or isDisabledToggleable %}disabled="disabled"{% endif %}

@@ -1,9 +1,7 @@
 <section id="grav-login">
     {{ content|raw }}
 
-    {% include 'partials/messages.html.twig' %}
-
-    <form method="post" action="{{ base_url_relative ~ uri.path }}">
+    <form method="post" action="{{ (base_url_relative ~ uri.path)|e }}">
         {% for field in form.fields %}
             {% if field.type %}
                 <div>

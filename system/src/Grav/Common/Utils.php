@@ -80,7 +80,7 @@ abstract class Utils
     }
 
     /**
-     * Returns the substring of a string up to a specified needle.  if not found, return the whole haytack
+     * Returns the substring of a string up to a specified needle.  if not found, return the whole haystack
      *
      * @param $haystack
      * @param $needle
@@ -94,6 +94,46 @@ abstract class Utils
         }
 
         return $haystack;
+    }
+
+    /**
+     * Utility method to replace only the first occurrence in a string
+     *
+     * @param $search
+     * @param $replace
+     * @param $subject
+     * @return mixed
+     */
+    public static function replaceFirstOccurrence($search, $replace, $subject)
+    {
+        if (!$search) {
+            return $subject;
+        }
+        $pos = strpos($subject, $search);
+        if ($pos !== false) {
+            $subject = substr_replace($subject, $replace, $pos, strlen($search));
+        }
+        return $subject;
+    }
+
+    /**
+     * Utility method to replace only the last occurrence in a string
+     *
+     * @param $search
+     * @param $replace
+     * @param $subject
+     * @return mixed
+     */
+    public static function replaceLastOccurrence($search, $replace, $subject)
+    {
+        $pos = strrpos($subject, $search);
+
+        if($pos !== false)
+        {
+            $subject = substr_replace($subject, $replace, $pos, strlen($search));
+        }
+
+        return $subject;
     }
 
     /**
@@ -853,6 +893,24 @@ abstract class Utils
     }
 
     /**
+     * Sort a multidimensional array  by another array of ordered keys
+     *
+     * @param array $array
+     * @param array $orderArray
+     * @return array
+     */
+    public static function sortArrayByArray(array $array, array $orderArray) {
+        $ordered = array();
+        foreach ($orderArray as $key) {
+            if (array_key_exists($key, $array)) {
+                $ordered[$key] = $array[$key];
+                unset($array[$key]);
+            }
+        }
+        return $ordered + $array;
+    }
+
+    /**
      * Get's path based on a token
      *
      * @param $path
@@ -902,5 +960,73 @@ abstract class Utils
         $path = str_replace($matches[0], rtrim($page->relativePagePath(), '/'), $path);
 
         return $path . $basename;
+    }
+
+    public static function getUploadLimit()
+    {
+        static $max_size = -1;
+
+        if ($max_size < 0) {
+            $post_max_size = static::parseSize(ini_get('post_max_size'));
+            if ($post_max_size > 0) {
+                $max_size = $post_max_size;
+            }
+
+            $upload_max = static::parseSize(ini_get('upload_max_filesize'));
+            if ($upload_max > 0 && $upload_max < $max_size) {
+                $max_size = $upload_max;
+            }
+        }
+
+        return $max_size;
+    }
+
+    /**
+     * Parse a readable file size and return a value in bytes
+     *
+     * @param $size
+     * @return int
+     */
+    public static function parseSize($size)
+    {
+        $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
+        $size = preg_replace('/[^0-9\.]/', '', $size);
+        if ($unit) {
+            return intval($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
+        } else {
+            return intval($size);
+        }
+    }
+
+    /**
+     * Multibyte-safe Parse URL function
+     *
+     * @param $url
+     * @return mixed
+     */
+    public static function multibyteParseUrl($url)
+    {
+        $enc_url = preg_replace_callback(
+            '%[^:/@?&=#]+%usD',
+            function ($matches)
+            {
+                return urlencode($matches[0]);
+            },
+            $url
+        );
+
+        $parts = parse_url($enc_url);
+
+        if($parts === false)
+        {
+            throw new \InvalidArgumentException('Malformed URL: ' . $url);
+        }
+
+        foreach($parts as $name => $value)
+        {
+            $parts[$name] = urldecode($value);
+        }
+
+        return $parts;
     }
 }
