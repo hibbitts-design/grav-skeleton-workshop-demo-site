@@ -1,11 +1,29 @@
 // Grav Editor
+.grav-editor-content {
+    position: relative;
+}
+
 .grav-editor {
     [data-grav-editor] {
         height: 300px;
+
+        &.code-mirrored {
+            padding: 0;
+            border: 0;
+            position: absolute;
+            z-index: -1;
+            display: block !important;
+        }
+    }
+
+    .CodeMirror {
+        .CodeMirror-vscrollbar, .CodeMirror-hscrollbar {
+            z-index: 1;
+        }
     }
 
     .CodeMirror-scroll {
-        margin-right: -36px;
+        //margin-right: -36px;
         position: static;
 
         // hide native scrollbar at the bottom
@@ -21,7 +39,7 @@
         z-index: 1;
     }
     .CodeMirror-selected {
-        background: Highlight;
+        background: #D6E8FF;
     }
 
     .CodeMirror-gutters {
@@ -80,6 +98,7 @@
     }
     .grav-editor-modes {
         flex-shrink: 0;
+        margin-right: 2px;
         ul {
             float: right;
         }
@@ -216,7 +235,7 @@
     &.CodeMirror {
         color: $paper-fg;
         line-height: 1.4;
-        z-index: 1;
+        font-size: 16px;
     }
 
     .cm-link {color: #0082ba;}

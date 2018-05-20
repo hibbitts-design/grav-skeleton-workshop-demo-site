@@ -2,7 +2,7 @@
 /**
  * @package    Grav.Common.Page
  *
- * @copyright  Copyright (C) 2014 - 2017 RocketTheme, LLC. All rights reserved.
+ * @copyright  Copyright (C) 2015 - 2018 Trilby Media, LLC. All rights reserved.
  * @license    MIT License; see LICENSE file for details.
  */
 
@@ -12,6 +12,7 @@ use Grav\Common\File\CompiledYamlFile;
 use Grav\Common\Grav;
 use Grav\Common\Data\Data;
 use Grav\Common\Data\Blueprint;
+use Grav\Common\Utils;
 
 class Medium extends Data implements RenderableInterface
 {
@@ -90,6 +91,20 @@ class Medium extends Data implements RenderableInterface
     public function meta()
     {
         return new Data($this->items);
+    }
+
+    /**
+     * Check if this medium exists or not
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+        $path = $this->get('filepath');
+        if (file_exists($path)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -270,10 +285,14 @@ class Medium extends Data implements RenderableInterface
         }
 
         if (empty($attributes['alt'])) {
-            if (!empty($alt) || $alt === '') {
+            if (!empty($alt)) {
                 $attributes['alt'] = $alt;
             } elseif (!empty($this->items['alt'])) {
                 $attributes['alt'] = $this->items['alt'];
+            } elseif (!empty($this->items['alt_text'])) {
+                $attributes['alt'] = $this->items['alt_text'];
+            } else {
+                $attributes['alt'] = '';
             }
         }
 
@@ -381,6 +400,22 @@ class Medium extends Data implements RenderableInterface
     }
 
     /**
+     * Helper method to determine if this media item has a thumbnail or not
+     *
+     * @param string $type;
+     *
+     * @return bool
+     */
+    public function thumbnailExists($type = 'page')
+    {
+        $thumbs = $this->get('thumbnails');
+        if (isset($thumbs[$type])) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Switch thumbnail.
      *
      * @param string $type
@@ -401,6 +436,7 @@ class Medium extends Data implements RenderableInterface
 
         return $this;
     }
+
 
     /**
      * Turn the current Medium into a Link
@@ -500,7 +536,12 @@ class Medium extends Data implements RenderableInterface
     {
         $qs = $method;
         if (count($args) > 1 || (count($args) == 1 && !empty($args[0]))) {
-            $qs .= '=' . implode(',', array_map(function ($a) { return rawurlencode($a); }, $args));
+            $qs .= '=' . implode(',', array_map(function ($a) {
+                if (is_array($a)) {
+                    $a = '[' . implode(',', $a) . ']';
+                }
+                return rawurlencode($a);
+            }, $args));
         }
 
         if (!empty($qs)) {

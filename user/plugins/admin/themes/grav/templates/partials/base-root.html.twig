@@ -1,4 +1,5 @@
 {% if uri.extension() == 'json' %}{% include 'default.json.twig' %}{% else %}
+    {% set icon_style = config.plugins.admin.admin_icons %}
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -31,7 +32,7 @@
     {% endblock %}
     </head>
     {% block body %}
-    <body class="{{ config.plugins.admin.sidebar.size == 'small' ? 'sidebar-closed' : '' }} {{ config.plugins.admin.body_classes }}">
+    <body class="ga-theme-17x {{ config.plugins.admin.sidebar.size == 'small' ? 'sidebar-closed' : '' }} {{ config.plugins.admin.body_classes }} {{ body_classes }}">
         {% block page %}
         <div class="remodal-bg">
 
@@ -45,6 +46,7 @@
                     {% block titlebar %}{% endblock %}
                 </div>
 
+                {% block content_wrapper %}
                 <div class="content-wrapper">
                     <div class="{% if config.plugins.admin.content_padding %}content-padding{% endif %}">
                         {% block messages %}
@@ -64,12 +66,14 @@
                         </div>
                         {% block footer %}
                         <footer id="footer">
-                             <a href="http://getgrav.org">Grav</a> v<span class="grav-version">{{ constant('GRAV_VERSION') }}</span> - Admin v{{ admin_version }} - {{ "PLUGIN_ADMIN.WAS_MADE_WITH"|tu|lower }} <i class="fa fa-heart"></i> {{ "PLUGIN_ADMIN.BY"|tu|lower }} <a href="http://www.rockettheme.com">RocketTheme</a>.
+                             <a href="http://getgrav.org">Grav</a> v<span class="grav-version">{{ constant('GRAV_VERSION') }}</span> - Admin v{{ admin_version }} - {{ "PLUGIN_ADMIN.WAS_MADE_WITH"|tu|lower }} <i class="fa fa-heart-o pulse"></i> {{ "PLUGIN_ADMIN.BY"|tu|lower }} <a href="https://trilby.media">Trilby Media</a>.
                         </footer>
                         {% endblock %}
                     </div>
                 </div>
+                {% endblock %}
 
+                {% block modals %}
                 <div class="remodal" data-remodal-id="generic" data-remodal-options="hashTracking: false">
                     <form>
                         <h1>{{ "PLUGIN_ADMIN.ERROR"|tu }}</h1>
@@ -104,12 +108,15 @@
                         </div>
                     </form>
                 </div>
+                {% endblock %}
 
             </main>
             <div id='overlay'></div>
         </div>
         {% endblock page %}
-    {% block bottom %}{% endblock %}
+    {% block bottom %}
+        {{ assets.js('bottom')|raw }}
+    {% endblock %}
     </body>
     {% endblock body %}
     </html>

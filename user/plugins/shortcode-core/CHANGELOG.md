@@ -1,3 +1,15 @@
+# v2.7.1
+## 03/14/2018
+
+1. [](#improved)
+    * Support shortcodes in theme as well as plugins [#43](https://github.com/getgrav/grav-plugin-shortcode-core/issues/43)
+
+# v2.7.0
+## 01/16/2018
+
+1. [](#new)
+    * Added a new `div` shortcode that supports `class` and `id` attributes
+
 # v2.6.0
 ## 04/25/2017
 

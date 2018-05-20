@@ -1,21 +1,20 @@
 name: Login
-version: 2.5.0
+version: 2.7.0
 description: Enables user authentication and login screen.
 icon: sign-in
 author:
   name: Team Grav
   email: devs@getgrav.org
   url: http://getgrav.org
-keywords: admin, plugin, login
 homepage: https://github.com/getgrav/grav-plugin-login
 keywords: login, authentication, admin, security
 bugs: https://github.com/getgrav/grav-plugin-login/issues
 license: MIT
 
 dependencies:
-  - { name: grav, version: '>=1.3.9' }
-  - { name: form, version: '>=2.4.0' }
-  - { name: email, version: '~2.0' }
+  - { name: grav, version: '>=1.4.4' }
+  - { name: form, version: '>=2.13.4' }
+  - { name: email, version: '>=2.7.0' }
 
 form:
   validation: loose
@@ -68,6 +67,12 @@ form:
               label: PLUGIN_LOGIN.REDIRECT_AFTER_LOGIN
               help: PLUGIN_LOGIN.REDIRECT_AFTER_LOGIN_HELP
               placeholder: "/my-page"
+
+            redirect_after_logout:
+              type: text
+              label: PLUGIN_LOGIN.REDIRECT_AFTER_LOGOUT
+              help: PLUGIN_LOGIN.REDIRECT_AFTER_LOGOUT_HELP
+              placeholder: "/"
 
             route_forgot:
               type: text
@@ -213,7 +218,7 @@ form:
               type: toggle
               label: PLUGIN_ADMIN.ENABLED
               help: PLUGIN_LOGIN.USER_REGISTRATION_ENABLED_HELP
-              highlight: 1
+              highlight: 0
               options:
                   1: PLUGIN_ADMIN.YES
                   0: PLUGIN_ADMIN.NO
@@ -231,7 +236,7 @@ form:
                   label: PLUGIN_LOGIN.REGISTRATION_FIELDS
                   help: PLUGIN_LOGIN.REGISTRATION_FIELDS_HELP
                   placeholder_key: PLUGIN_LOGIN.REGISTRATION_FIELD_KEY
-                  placeholder_value: PLUGIN_LOGIN.REGISTRATION_FIELD_VALUE
+                  placeholder_value: PLUGIN_LOGIN.ADDITIONAL_PARAM_VALUE
 
                 user_registration.default_values:
                   type: array
@@ -296,7 +301,7 @@ form:
                   type: toggle
                   label: PLUGIN_LOGIN.LOGIN_AFTER_REGISTRATION
                   help: PLUGIN_LOGIN.LOGIN_AFTER_REGISTRATION_HELP
-                  highlight: 1
+                  highlight: 0
                   options:
                       1: PLUGIN_ADMIN.YES
                       0: PLUGIN_ADMIN.NO
