@@ -1,0 +1,4 @@
+enabled: true
+pages:
+  markdown:
+    extra: true

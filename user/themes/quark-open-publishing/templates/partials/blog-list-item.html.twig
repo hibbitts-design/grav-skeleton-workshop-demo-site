@@ -1,0 +1,53 @@
+{% if page.header.hide_from_post_list != true %}
+  <div class="card">
+      {% set image = page.media.images|first %}
+      {% if image %}
+      <div class="card-image">
+
+        {# support image credit tag with optional image meta file - hibbittsdesign.org #}
+          {% if page.header.header_image_credit %}
+            {% set image_credit = page.header.header_image_credit %}
+            {% set image_creditlink = page.header.header_image_creditlink %}
+            {% set image_alt_text = page.header.header_image_alt_text %}
+          {% elseif header_image_media.meta.header_image_credit  %}
+            {% set image_credit = header_image_media.meta.header_image_credit %}
+            {% set image_creditlink = header_image_media.meta.header_image_creditlink %}
+            {% set image_alt_text = header_image_media.meta.header_image_alt_text %}
+          {% endif %}
+          {% if image_credit %}
+            <div class="image-credit-wrapper"><span class="image-credit">
+              {% if image_creditlink %}
+                Image: <a class="newwindow external-link" href="{{ image_creditlink }}">
+                {{ image_credit }}</a></span>
+                <a href="{{ page.url }}">{{ image.cropZoom(800,400).html }}</a>
+              {% else %}
+                Image: {{ image_credit }}</span>
+                <a href="{{ page.url }}">{{ image.cropZoom(800,400).html }}</a>
+              {% endif %}
+            </div>
+          {% else %}
+            <a href="{{ page.url }}">{{ image.cropZoom(800,400).html }}</a>
+          {% endif %}
+
+      </div>
+      {% endif %}
+      <div class="card-header">
+          <div class="card-subtitle text-gray">
+              {% include 'partials/blog/date.html.twig' %}
+      </div>
+          <div class="card-title">
+          {% include 'partials/blog/title.html.twig' with {title_level: 'h5'} %}
+          </div>
+      </div>
+      <div class="card-body">
+          {% if page.summary != page.content %}
+              {{ page.summary }}
+          {% else %}
+              {{ page.content }}
+          {% endif %}
+      </div>
+      <div class="card-footer">
+          {% include 'partials/blog/taxonomy.html.twig' %}
+      </div>
+  </div>
+{% endif %}
