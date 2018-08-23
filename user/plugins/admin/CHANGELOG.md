@@ -1,3 +1,73 @@
+# v1.8.8
+## 08/17/2018
+
+1. [](#improved)
+    * Added support for textarea value type in `array` field
+    * Added some new lang strings for Grav 1.5.0
+1. [](#bugfix)
+    * Support params and querystring in login redirect
+    * Added field name nesting with tab field
+    
+# v1.8.7
+## 07/31/2018
+
+1. [](#improved)
+    * Support URI Params and Query attributes in Login redirect
+1. [](#bugfix)
+    * Fix for deleting 'extra' media files [grav#2100](https://githubcom/getgrav/grav/issues/2100)
+
+# v1.8.6
+## 07/13/2018
+
+1. [](#bugfix)
+    * Force `html` for markdown preview [grav#2066](https://github.com/getgrav/grav/issues/2066)
+    * Add missing `authorizeTask()` checks in controller [#1483](https://github.com/getgrav/grav/issues/1483)
+    * Add support for `force_ssl` to admin URLs [#1479](https://github.com/getgrav/grav-plugin-admin/issues/1479)
+
+# v1.8.5
+## 06/20/2018
+
+1. [](#bugfix)
+    * Fixed broken folder attribute on filepicker [#1465](https://github.com/getgrav/grav-plugin-admin/issues/1465)
+    * Added translation for system.session.initialize
+    * Slight updates on new translation strings
+
+# v1.8.4
+## 06/11/2018
+
+1. [](#improved)
+    * Including EXIF JS library in the modules dependencies to fix orientation when uploading images
+1. [](#bugfix)
+    * Initialize session on setup [#1451](https://github.com/getgrav/grav-plugin-admin/issues/1451)
+    * Force a `null` order when empty in the post request
+    * Fixed some 2FA form styling issues
+
+# v1.8.3
+## 05/31/2018
+
+1. [](#new)
+    * Added support for selectize plugins as options in the selectize field
+1. [](#bugfix)
+    * Fixed deep linking in admin after login [#1456](https://github.com/getgrav/grav-plugin-admin/issues/1456)
+    * Fixed Undefined property: `stdClass::$image` in v1.8.2 [#1454](https://github.com/getgrav/grav-plugin-admin/issues/1454)
+    * Pass media order when calling `task:listmedia`
+
+# v1.8.2
+## 05/24/2018
+
+1. [](#new)
+    * Added custom object support for filepicker field
+    * Don't allow saving of a user with no local account file
+    * Controls for `list` field were not in sync between top and bottom
+1. [](#improved)
+    * More subtle `fieldset` styling
+1. [](#bugfix)
+    * Check if `$object->blueprints()` exists in `onAdminAfterSave`
+    * When creating first user, check `admin.login` not `site.login`
+    * Fix admin login redirects for multisite setups
+    * Fixed issue with filepicker field where images wouldn't properly merge with the current value if in a page header 
+    * Fixed media delete for streams
+
 # v1.8.1
 ## 05/15/2018
 

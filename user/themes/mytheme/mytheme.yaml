@@ -5,4 +5,5 @@ streams:
      prefixes:
        '':
        - user/themes/mytheme
-       - user/themes/antimatter
+       - user/themes/quark-open-publishing
+       - user/themes/quark

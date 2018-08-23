@@ -12,9 +12,9 @@ use Grav\Common\File\CompiledYamlFile;
 use Grav\Common\Grav;
 use Grav\Common\Data\Data;
 use Grav\Common\Data\Blueprint;
-use Grav\Common\Utils;
+use Grav\Common\Media\Interfaces\MediaObjectInterface;
 
-class Medium extends Data implements RenderableInterface
+class Medium extends Data implements RenderableInterface, MediaObjectInterface
 {
     use ParsedownHtmlTrait;
 
@@ -73,6 +73,11 @@ class Medium extends Data implements RenderableInterface
         $this->reset();
     }
 
+    public function __clone()
+    {
+        // Allows future compatibility as parent::__clone() works.
+    }
+
     /**
      * Create a copy of this media object
      *
@@ -80,7 +85,7 @@ class Medium extends Data implements RenderableInterface
      */
     public function copy()
     {
-        return clone($this);
+        return clone $this;
     }
 
     /**
@@ -194,7 +199,12 @@ class Medium extends Data implements RenderableInterface
      */
     public function url($reset = true)
     {
-        $output = preg_replace('|^' . preg_quote(GRAV_ROOT) . '|', '', $this->get('filepath'));
+        $output = preg_replace('|^' . preg_quote(GRAV_ROOT, '|') . '|', '', $this->get('filepath'));
+
+        $locator = Grav::instance()['locator'];
+        if ($locator->isStream($output)) {
+            $output = $locator->findResource($output, false);
+        }
 
         if ($reset) {
             $this->reset();

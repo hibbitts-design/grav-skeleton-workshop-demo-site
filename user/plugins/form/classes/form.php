@@ -402,7 +402,10 @@ class Form extends Iterator implements \Serializable
             (array) $settings,
             ['name' => $post['name']]
         );
-
+        // Allow plugins to adapt settings for a given post name
+        // Useful if schema retrieval is not an option, e.g. dynamically created forms
+        $grav->fireEvent('onFormUploadSettings', new Event(['settings' => &$settings, 'post' => $post]));
+        
         $upload = $this->normalizeFiles($_FILES['data'], $settings->name);
 
         // Handle errors and breaks without proceeding further
@@ -625,11 +628,14 @@ class Form extends Iterator implements \Serializable
     public function post()
     {
         $grav = Grav::instance();
-        $uri = $grav['uri']->url;
+        $uri = $grav['uri'];
+        $url = $uri->url;
         $session = $grav['session'];
 
-        if (isset($_POST)) {
-            $this->values = new Data(isset($_POST) ? (array)$_POST : []);
+        $post = $uri->post();
+
+        if ($post) {
+            $this->values = new Data((array)$post);
             $data = $this->values->get('data');
 
             // Add post data to form dataset
@@ -694,8 +700,12 @@ class Form extends Iterator implements \Serializable
         // Process previously uploaded files for the current URI
         // and finally store them. Everything else will get discarded
         $queue = $session->getFlashObject('files-upload');
-        $queue = $queue[base64_encode($uri)];
+        $queue = $queue[base64_encode($url)];
         if (is_array($queue)) {
+            // Allow plugins to implement additional / alternative logic
+            // Add post to event data
+            $grav->fireEvent('onFormStoreUploads', new Event(['queue' => &$queue, 'form' => $this, 'post' => $post]));
+            
             foreach ($queue as $key => $files) {
                 foreach ($files as $destination => $file) {
                     if (!rename($file['tmp_name'], $destination)) {

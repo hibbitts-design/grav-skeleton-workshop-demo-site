@@ -1,3 +1,33 @@
+# v2.16.1
+## 08/20/2018
+
+1. [](#new)
+    * Fixed a regression issue with `file` & `array` field
+
+# v2.16.0
+## 08/20/2018
+
+1. [](#new)
+    * Added new `form.keep_alive` option to keep session alive [#275](https://github.com/getgrav/grav-plugin-form/issues/275)
+    * Added `array` field for frontend use
+1. [](#improved)
+    * Improving compatibility `autocomplete` spec [#274](https://github.com/getgrav/grav-plugin-form/pull/274)    
+
+# v2.15.1
+## 06/20/2018
+
+1. [](#improved)
+    * Including EXIF JS library in the modules dependencies to fix orientation when uploading images 
+1. [](#bugfix)
+   * Fix HTML data template for checkboxes fields where 'use' property is "keys" [#258](https://github.com/getgrav/grav-plugin-form/pull/258)
+
+# v2.15.0
+## 05/31/2018
+
+1. [](#new)
+    * Added support for `Uri::post()`
+    * Added support for `autocapitalize`, `inputmode`, and `spellcheck` options in field definitions
+
 # v2.14.1
 ## 05/15/2018
 

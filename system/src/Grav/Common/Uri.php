@@ -11,6 +11,7 @@ namespace Grav\Common;
 use Grav\Common\Config\Config;
 use Grav\Common\Language\Language;
 use Grav\Common\Page\Page;
+use Grav\Common\Page\Pages;
 use Grav\Framework\Route\RouteFactory;
 use Grav\Framework\Uri\UriFactory;
 use Grav\Framework\Uri\UriPartsFilter;
@@ -150,17 +151,10 @@ class Uri
 
         $uri = str_replace(static::filterPath($this->root), '', $this->url);
 
-
         // remove the setup.php based base if set:
         $setup_base = $grav['pages']->base();
         if ($setup_base) {
-            $uri = str_replace($setup_base, '', $uri);
-        }
-
-        // If configured to, redirect trailing slash URI's with a 302 redirect
-        $redirect = str_replace($this->root, '', rtrim($uri, '/'));
-        if ($redirect && $uri !== '/' && $redirect !== $this->base() && $config->get('system.pages.redirect_trailing_slash', false) && Utils::endsWith($uri, '/')) {
-            $grav->redirect($redirect, 302);
+            $uri = preg_replace('|^' . preg_quote($setup_base, '|') . '|', '', $uri);
         }
 
         // process params
@@ -207,9 +201,9 @@ class Uri
         }
 
         // Set some Grav stuff
-        $grav['base_url_absolute'] = $grav['config']->get('system.custom_base_url') ?: $this->rootUrl(true);
+        $grav['base_url_absolute'] = $config->get('system.custom_base_url') ?: $this->rootUrl(true);
         $grav['base_url_relative'] = $this->rootUrl(false);
-        $grav['base_url'] = $grav['config']->get('system.absolute_urls') ? $grav['base_url_absolute'] : $grav['base_url_relative'];
+        $grav['base_url'] = $config->get('system.absolute_urls') ? $grav['base_url_absolute'] : $grav['base_url_relative'];
 
         RouteFactory::setRoot($this->root_path);
         RouteFactory::setLanguage($language->getLanguageURLPrefix());
@@ -377,6 +371,17 @@ class Uri
         return $this->extension;
     }
 
+    public function method()
+    {
+        $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
+
+        if ($method === 'POST' && isset($_SERVER['X-HTTP-METHOD-OVERRIDE'])) {
+            $method = strtoupper($_SERVER['X-HTTP-METHOD-OVERRIDE']);
+        }
+
+        return $method;
+    }
+
     /**
      * Return the scheme of the URI
      *
@@ -482,11 +487,9 @@ class Uri
     {
         if ($include_root) {
             return $this->uri;
-        } else {
-            $uri = str_replace($this->root_path, '', $this->uri);
-            return $uri;
         }
 
+        return str_replace($this->root_path, '', $this->uri);
     }
 
     /**
@@ -509,16 +512,10 @@ class Uri
     {
         $grav = Grav::instance();
 
-        // Link processing should prepend language
-        $language = $grav['language'];
-        $language_append = '';
-        if ($language->enabled()) {
-            $language_append = $language->getLanguageURLPrefix();
-        }
+        /** @var Pages $pages */
+        $pages = $grav['pages'];
 
-        $base = $grav['base_url_relative'];
-
-        return rtrim($base . $grav['pages']->base(), '/') . $language_append;
+        return $pages->baseUrl(null, false);
     }
 
     /**
@@ -634,10 +631,9 @@ class Uri
         }
 
         return $ip;
-
     }
-    /**
 
+    /**
      * Returns current Uri.
      *
      * @return \Grav\Framework\Uri\Uri
@@ -687,18 +683,19 @@ class Uri
      */
     public static function buildUrl($parsed_url)
     {
-        $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : (isset($parsed_url['host']) ? '//' : '');
-        $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
-        $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-        $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
-        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
-        $pass     = ($user || $pass) ? "{$pass}@" : '';
-        $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
-        $path     = !empty($parsed_url['params']) ? rtrim($path, '/') . static::buildParams($parsed_url['params']) : $path;
-        $query    = !empty($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
-        $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+        $scheme    = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . ':' : '';
+        $authority = isset($parsed_url['host']) ? '//' : '';
+        $host      = isset($parsed_url['host']) ? $parsed_url['host'] : '';
+        $port      = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+        $user      = isset($parsed_url['user']) ? $parsed_url['user'] : '';
+        $pass      = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
+        $pass      = ($user || $pass) ? "{$pass}@" : '';
+        $path      = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+        $path      = !empty($parsed_url['params']) ? rtrim($path, '/') . static::buildParams($parsed_url['params']) : $path;
+        $query     = !empty($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+        $fragment  = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
 
-        return "{$scheme}{$user}{$pass}{$host}{$port}{$path}{$query}{$fragment}";
+        return "{$scheme}{$authority}{$user}{$pass}{$host}{$port}{$path}{$query}{$fragment}";
     }
 
     /**
@@ -883,7 +880,26 @@ class Uri
     public static function parseUrl($url)
     {
         $grav = Grav::instance();
-        $parts = parse_url($url);
+
+        $encodedUrl = preg_replace_callback(
+            '%[^:/@?&=#]+%usD',
+            function ($matches) { return rawurlencode($matches[0]); },
+            $url
+        );
+
+        $parts = parse_url($encodedUrl);
+
+        if (false === $parts) {
+            return false;
+        }
+
+        foreach($parts as $name => $value) {
+            $parts[$name] = rawurldecode($value);
+        }
+
+        if (!isset($parts['path'])) {
+            $parts['path'] = '';
+        }
 
         list($stripped_path, $params) = static::extractParams($parts['path'], $grav['config']->get('system.param_sep'));
 
@@ -1119,8 +1135,12 @@ class Uri
     protected function createFromEnvironment(array $env)
     {
         // Build scheme.
-        if (isset($env['REQUEST_SCHEME'])) {
-            $this->scheme = $env['REQUEST_SCHEME'];
+        if (isset($env['HTTP_X_FORWARDED_PROTO'])) {
+            $this->scheme = $env['HTTP_X_FORWARDED_PROTO'];
+        } elseif (isset($env['X-FORWARDED-PROTO'])) {
+            $this->scheme = $env['X-FORWARDED-PROTO'];
+        } elseif (isset($env['REQUEST_SCHEME'])) {
+           $this->scheme = $env['REQUEST_SCHEME'];
         } else {
             $https = isset($env['HTTPS']) ? $env['HTTPS'] : '';
             $this->scheme = (empty($https) || strtolower($https) === 'off') ? 'http' : 'https';
@@ -1143,7 +1163,16 @@ class Uri
         $this->host = $this->validateHostname($hostname) ? $hostname : 'unknown';
 
         // Build port.
-        $this->port = isset($env['SERVER_PORT']) ? (int)$env['SERVER_PORT'] : null;
+        if (isset($env['HTTP_X_FORWARDED_PORT'])) {
+           $this->port = (int)$env['HTTP_X_FORWARDED_PORT'];
+        } elseif (isset($env['X-FORWARDED-PORT'])) {
+           $this->port = (int)$env['X-FORWARDED-PORT'];
+        } elseif (isset($env['SERVER_PORT'])) {
+           $this->port = (int)$env['SERVER_PORT'];
+        } else {
+           $this->port = null;
+        }
+
         if ($this->hasStandardPort()) {
             $this->port = null;
         }
@@ -1249,7 +1278,7 @@ class Uri
     {
         if (!$this->post) {
             $content_type = $this->getContentType();
-            if ($content_type == 'application/json') {
+            if ($content_type === 'application/json') {
                 $json = file_get_contents('php://input');
                 $this->post = json_decode($json, true);
             } elseif (!empty($_POST)) {
@@ -1257,7 +1286,7 @@ class Uri
             }
         }
 
-        if ($this->post && !is_null($element)) {
+        if ($this->post && null !== $element) {
             $item = Utils::getDotNotation($this->post, $element);
             if ($filter_type) {
                 $item = filter_var($item, $filter_type);

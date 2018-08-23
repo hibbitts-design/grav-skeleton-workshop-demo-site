@@ -1,7 +1,10 @@
+{% set item_col = show_sidebar ? 'col-9 col-md-12' : 'col-12' %}
+{% set sidebar_col = show_sidebar ? 'col-3 col-md-12' : 'col-12' %}
+
 {# check content display flag - hibbittsdesign.org #}
-{% if not(grav.uri.param('chromeless')) and (not theme_var('chromeless.enabled')) %}
-  {% set item_col = show_sidebar ? 'col-9 col-md-12' : 'col-12' %}
-  {% set sidebar_col = show_sidebar ? 'col-3 col-md-12' : 'col-12' %}
+{% if grav.uri.param('chromeless') or theme_var('chromeless.enabled') %}
+  {% set item_col = 'col-12' %}
+  {% set sidebar_col = 'col-12' %}
 {% endif %}
 
 <div class="columns">

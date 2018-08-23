@@ -1,3 +1,15 @@
+# v1.3.3
+## 08/21/2018
+
+1. [](#bugfix)
+    * Reinstated caching that was broken from previous PR [#23](https://github.com/getgrav/grav-plugin-taxonomylist/issues/23)
+
+# v1.3.2
+## 05/21/2017
+
+1. [](#improved)
+    * Removed Grav trait in favor of `Grav::instance()`
+
 # v1.3.1
 ## 11/02/2017
 
